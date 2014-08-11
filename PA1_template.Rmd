@@ -3,20 +3,88 @@
 
 ## Loading and preprocessing the data
 ```{r echo = TRUE}
+substrLast4 <- function(x){
+  substr(x, nchar(x)-3, nchar(x))
+}
+
+# Load the data (i.e. read.csv())
 file <- "activity.zip"
 data <- read.csv(unz(file, "activity.csv"), header=TRUE, sep=",")
+
+# Process/transform the data (if necessary) into a format suitable for your analysis
+data$date <- as.Date(data$date, "%Y-%m-%d")
+tmp <- paste("000",data$interval, sep="")
+time <- lapply(tmp, substrLast4)
+data$time <- as.POSIXct(paste(data$date, time), format="%Y-%m-%d %H%M")
 ```
 
-
 ## What is mean total number of steps taken per day?
+```{r echo = TRUE}
+# Make a histogram of the total number of steps taken each day
+sum_aggr = aggregate(data$steps, by=list(Category=data$date), FUN=sum, na.rm = TRUE)
+barplot(sum_aggr$x, names.arg=sum_aggr$Category)
 
+# Calculate and report the mean and median total number of steps taken per day
+mean_steps <- mean(sum_aggr$x)
+median_steps <- median(sum_aggr$x)
 
+mean_array <- rep(mean_steps, length(sum_aggr$Category))
+median_array <- rep(median(sum_aggr$x), length(sum_aggr$Category))
+
+abline(lm(mean_array~sum_aggr$Category),col="blue")
+abline(lm(median_array~sum_aggr$Category),col="red")
+legend("topleft", lwd = 2, col = c("blue", "red"), legend = c("mean", "median"))
+
+mean_steps
+median_steps
+```
 
 ## What is the average daily activity pattern?
+```{r echo = TRUE}
+# Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
+mean_array <- rep(mean(data$steps, na.rm = TRUE), length(data$time))
 
+plot(data$time, data$steps, type="l")
+abline(lm(mean_array~data$time),col="blue")
+legend("topleft", lwd = 2, col = c("blue"), legend = c("mean"))
 
+# Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+data$steps[is.na(data$steps)] <- -1
+data[data$steps==max(data$steps, na.rm = TRUE) ,]
+data$steps[data$steps==-1] <- NA
+```
 
 ## Imputing missing values
+```{r echo = TRUE}
+# Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+length(data$steps[is.na(data$steps)])
+
+# Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+# The strategy is to use the mean steps for the existing ones: 
+dafault_step <- mean(data$steps, na.rm = TRUE)
+
+# Create a new dataset that is equal to the original dataset but with the missing data filled in.
+filled_data <- data
+filled_data$steps[is.na(filled_data$steps)] <- dafault_step
+
+# Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+sum_aggr = aggregate(filled_data$steps, by=list(Category=filled_data$date), FUN=sum)
+barplot(sum_aggr$x, names.arg=sum_aggr$Category)
+
+# Calculate and report the mean and median total number of steps taken per day
+mean_steps <- mean(sum_aggr$x)
+median_steps <- median(sum_aggr$x)
+
+mean_array <- rep(mean_steps, length(sum_aggr$Category))
+median_array <- rep(median(sum_aggr$x), length(sum_aggr$Category))
+
+abline(lm(mean_array~sum_aggr$Category),col="blue")
+abline(lm(median_array~sum_aggr$Category),col="red")
+legend("topleft", lwd = 2, col = c("blue", "red"), legend = c("mean", "median"))
+
+mean_steps
+median_steps
+```
 
 
 
