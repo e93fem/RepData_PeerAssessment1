@@ -2,7 +2,8 @@
 
 
 ## Loading and preprocessing the data
-```{r echo = TRUE}
+
+```r
 substrLast4 <- function(x){
   substr(x, nchar(x)-3, nchar(x))
 }
@@ -19,7 +20,8 @@ data$time <- as.POSIXct(paste(data$date, time), format="%Y-%m-%d %H%M")
 ```
 
 ## What is mean total number of steps taken per day?
-```{r echo = TRUE}
+
+```r
 # Make a histogram of the total number of steps taken each day
 sum_aggr = aggregate(data$steps, by=list(Category=data$date), FUN=sum, na.rm = TRUE)
 barplot(sum_aggr$x, names.arg=sum_aggr$Category)
@@ -38,27 +40,55 @@ legend("topleft", lwd = 2, col = c("blue", "red"),
                   paste("median (", round(median_steps), ")", sep="")))
 ```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2.png) 
+
 ## What is the average daily activity pattern?
-```{r echo = TRUE}
+
+```r
 # Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 min5_mean <- mean(data$steps, na.rm = TRUE)
 min5_mean
+```
 
+```
+## [1] 37.38
+```
+
+```r
 plot(data$time, data$steps-min5_mean, type="l", 
      xlab = 'Date', 
      ylab = paste('Number of steps (minus mean ', round(min5_mean), ')'))
+```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+
+```r
 # Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 data$steps[is.na(data$steps)] <- -1
 data[data$steps==max(data$steps, na.rm = TRUE) ,]
+```
+
+```
+##       steps       date interval                time
+## 16492   806 2012-11-27      615 2012-11-27 06:15:00
+```
+
+```r
 data$steps[data$steps==-1] <- NA
 ```
 
 ## Imputing missing values
-```{r echo = TRUE}
+
+```r
 # Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 length(data$steps[is.na(data$steps)])
+```
 
+```
+## [1] 2304
+```
+
+```r
 # Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 # The strategy is to use the mean steps for the existing ones: 
 dafault_step <- mean(data$steps, na.rm = TRUE)
@@ -84,10 +114,13 @@ legend("topleft", lwd = 2, col = c("blue", "red"),
                   paste("median (", round(median_steps), ")", sep="")))
 ```
 
+![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4.png) 
+
 The impact in this case is that instead of handling the NA as ignored they are in this case replaced by the mean value of the other steps. The result is that the mean and median have increased. What is wrong and right depends on if the missing values should be handles as no steps (last plot) or missed steps (this plot).  
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r echo = TRUE}
+
+```r
 # Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 sunday <- as.POSIXlt(filled_data$date)$wday==0
 saturday <- as.POSIXlt(filled_data$date)$wday==6
@@ -104,11 +137,17 @@ plot(weekday_data$step-mean_weekday_steps, type="l",
      xlab = 'Weekday interval', 
      ylab = paste('Number of steps (minus mean ', round(mean_weekday_steps), ')', sep=""),
      main = 'Weekday')
+```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-51.png) 
+
+```r
 plot(weekend_data$step-mean_weekend_steps, type="l", 
      xlab = 'Weekend interval', 
      ylab = paste('Number of steps (minus mean ', round(mean_weekend_steps), ')', sep=""),
      main = 'Weekend')
 ```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-52.png) 
 
 There are different activity pattern. Mean number if steps are bigger on weekends than weekdays, but there are more higher step intervals on weekdays than on weekends.

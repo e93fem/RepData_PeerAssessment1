@@ -1,5 +1,11 @@
 setwd("C:/Users/Fredrik/Documents/Reproducible Research/Projects/RepData_PeerAssessment1")
 
+install.packages("mime")
+library(mime)
+
+
+knit2html("PA1_template.Rmd")
+
 substrLast4 <- function(x){
   substr(x, nchar(x)-3, nchar(x))
 }
