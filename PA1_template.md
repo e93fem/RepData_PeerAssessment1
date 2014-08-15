@@ -68,12 +68,13 @@ plot(data$time, data$steps-min5_mean, type="l",
 # contains the maximum number of steps?
 mean_aggr = aggregate(data$steps, by=list(Category=data$interval), FUN=mean, na.rm = TRUE)
 colnames(mean_aggr) <- c("interval","steps")
-sum_aggr[mean_aggr$steps==max(mean_aggr$steps),]
+mean_array <- rep(max(mean_aggr$steps), length(mean_aggr$steps))
+mean_aggr[round(mean_aggr$steps-max(mean_aggr$steps),3)==0,]
 ```
 
 ```
-##    Category  x
-## NA     <NA> NA
+##     interval steps
+## 104      835 206.2
 ```
 
 ## Imputing missing values
@@ -152,4 +153,4 @@ qplot(interval,steps-mean_steps,hwy,data=mean_aggr,facets=weekday~.,geom=c("line
 
 ![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
 
-There are different activity pattern. .
+There are different activity pattern. On weekdays there is a big top around 830 but on weekends there are a number of smaller tops.

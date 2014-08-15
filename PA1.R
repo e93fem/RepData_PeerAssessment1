@@ -2,6 +2,7 @@ setwd("C:/Users/Fredrik/Documents/Reproducible Research/Projects/RepData_PeerAss
 
 install.packages("mime")
 library(mime)
+library(knitr)
 
 knit2html("PA1_template.Rmd")
 
