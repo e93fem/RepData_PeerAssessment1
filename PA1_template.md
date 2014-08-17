@@ -47,18 +47,10 @@ legend("topleft", lwd = 2, col = c("blue", "red"),
 ```r
 # Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) 
 # and the average number of steps taken, averaged across all days (y-axis)
-min5_mean <- mean(data$steps, na.rm = TRUE)
-min5_mean
-```
+mean_aggr = aggregate(data$steps, by=list(Category=data$interval), FUN=mean, na.rm = TRUE)
+colnames(mean_aggr) <- c("interval","steps")
 
-```
-## [1] 37.38
-```
-
-```r
-plot(data$time, data$steps-min5_mean, type="l", 
-     xlab = 'Date', 
-     ylab = paste('Number of steps (minus mean ', round(min5_mean), ')'))
+plot(mean_aggr$interval, mean_aggr$steps, type="l", xlab = 'Interval', ylab = 'Mean steps')
 ```
 
 ![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
@@ -66,8 +58,6 @@ plot(data$time, data$steps-min5_mean, type="l",
 ```r
 # Which 5-minute interval, on average across all the days in the dataset, 
 # contains the maximum number of steps?
-mean_aggr = aggregate(data$steps, by=list(Category=data$interval), FUN=mean, na.rm = TRUE)
-colnames(mean_aggr) <- c("interval","steps")
 mean_array <- rep(max(mean_aggr$steps), length(mean_aggr$steps))
 mean_aggr[round(mean_aggr$steps-max(mean_aggr$steps),3)==0,]
 ```
@@ -153,4 +143,4 @@ qplot(interval,steps-mean_steps,hwy,data=mean_aggr,facets=weekday~.,geom=c("line
 
 ![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
 
-There are different activity pattern. On weekdays there is a big top around 830 but on weekends there are a number of smaller tops.
+There are different activity pattern. On weekdays there is a big top around 830 but on weekends there are instead a number of smaller tops.
