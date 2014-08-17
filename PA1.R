@@ -4,7 +4,7 @@ install.packages("mime")
 library(mime)
 library(knitr)
 
-knit2html("PA1_template.Rmd")
+knit2html("PA1.Rmd")
 
 substrLast4 <- function(x){
   substr(x, nchar(x)-3, nchar(x))
